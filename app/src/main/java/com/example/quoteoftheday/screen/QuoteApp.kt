@@ -18,9 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import com.example.quoteoftheday.BottomNavigationBar
-import com.example.quoteoftheday.FavoritesScreen
-import com.example.quoteoftheday.HomeScreen
+import com.example.quoteoftheday.data.QuoteRepository
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.quoteoftheday.screen.QuoteApp
 import com.example.quoteoftheday.ui.theme.QuoteOfTheDayTheme
 
 class MainActivity : ComponentActivity() {

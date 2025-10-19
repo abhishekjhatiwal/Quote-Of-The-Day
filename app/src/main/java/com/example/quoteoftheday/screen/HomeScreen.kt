@@ -26,9 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,100 +35,96 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.quoteoftheday.QuoteViewModel
 import com.example.quoteoftheday.data.Quote
-import com.example.quoteoftheday.data.QuoteRepository
 
 @Composable
-fun HomeScreen(quote: Quote, onRefresh: () -> Unit) {
-    var isFavorite by remember(quote.id) {
-        mutableStateOf(QuoteRepository.isFavorite(quote.id))
-    }
-
+fun HomeScreen(viewModel: QuoteViewModel) {
     val context = LocalContext.current
+    val currentQuote by viewModel.currentQuote.observeAsState()
+    val isFavorite by viewModel.isFavorite.observeAsState(false)
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Card(
+    currentQuote?.let { quote ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .animateContentSize(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF252541)
-            ),
-            elevation = CardDefaults.cardElevation(8.dp)
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF252541)
+                ),
+                elevation = CardDefaults.cardElevation(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.FormatQuote,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = Color(0xFF6B4EFF)
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FormatQuote,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = Color(0xFF6B4EFF)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = "\"${quote.text}\"",
+                        style = MaterialTheme.typography.headlineSmall,
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        lineHeight = 32.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = "— ${quote.author}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFFB0B0C8),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ActionButton(
+                    icon = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    text = if (isFavorite) "Saved" else "Save",
+                    color = Color(0xFFFF6B9D),
+                    onClick = {
+                        viewModel.toggleFavorite(quote)
+                    }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "\"${quote.text}\"",
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    lineHeight = 32.sp
+                ActionButton(
+                    icon = Icons.Default.Share,
+                    text = "Share",
+                    color = Color(0xFF6B4EFF),
+                    onClick = {
+                        shareQuote(context, quote)
+                    }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "— ${quote.author}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color(0xFFB0B0C8),
-                    fontWeight = FontWeight.Medium
+                ActionButton(
+                    icon = Icons.Default.Refresh,
+                    text = "New Quote",
+                    color = Color(0xFF4ECDC4),
+                    onClick = { viewModel.loadRandomQuote() }
                 )
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ActionButton(
-                icon = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                text = if (isFavorite) "Saved" else "Save",
-                color = Color(0xFFFF6B9D),
-                onClick = {
-                    QuoteRepository.toggleFavorite(quote)
-                    isFavorite = !isFavorite
-                }
-            )
-
-            ActionButton(
-                icon = Icons.Default.Share,
-                text = "Share",
-                color = Color(0xFF6B4EFF),
-                onClick = {
-                    // Share functionality would be implemented here
-                    // For now, it's a placeholder
-                    shareQuote(context, quote)
-                }
-            )
-
-            ActionButton(
-                icon = Icons.Default.Refresh,
-                text = "New Quote",
-                color = Color(0xFF4ECDC4),
-                onClick = onRefresh
-            )
         }
     }
 }

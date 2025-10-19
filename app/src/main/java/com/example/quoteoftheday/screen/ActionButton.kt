@@ -39,9 +39,9 @@ fun ActionButton(
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = text,
                 tint = color,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(28.dp),
+                contentDescription = text
             )
         }
 

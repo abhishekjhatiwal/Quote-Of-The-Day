@@ -1,9 +1,12 @@
 package com.example.quoteoftheday.data
 
-// Data class for Quote
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "quotes")
 data class Quote(
-    val id: Int,
+    @PrimaryKey val id: Int,
     val text: String,
     val author: String,
-    var isFavorite: Boolean = false
+    val isFavorite: Boolean = false
 )

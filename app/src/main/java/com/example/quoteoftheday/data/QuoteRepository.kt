@@ -1,14 +1,13 @@
 package com.example.quoteoftheday.data
 
-import androidx.compose.runtime.mutableStateListOf
+import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.Random
+import java.util.*
 
-// Quote Repository
+class QuoteRepository(private val quoteDao: QuoteDao) {
 
-object QuoteRepository {
+    val allFavorites: Flow<List<Quote>> = quoteDao.getFavoriteQuotes()
+
     private val quotes = listOf(
         Quote(1, "The only way to do great work is to love what you do.", "Steve Jobs"),
         Quote(2, "Innovation distinguishes between a leader and a follower.", "Steve Jobs"),
@@ -27,8 +26,6 @@ object QuoteRepository {
         Quote(15, "Believe you can and you're halfway there.", "Theodore Roosevelt")
     )
 
-    private val favorites = mutableStateListOf<Quote>()
-
     fun getQuoteForDate(date: Date): Quote {
         val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         val seed = dateFormat.format(date).toLong()
@@ -40,18 +37,17 @@ object QuoteRepository {
         return quotes.random()
     }
 
-    fun toggleFavorite(quote: Quote) {
-        val existing = favorites.find { it.id == quote.id }
-        if (existing != null) {
-            favorites.remove(existing)
+    suspend fun toggleFavorite(quote: Quote) {
+        val existingQuote = quoteDao.getQuoteById(quote.id)
+        if (existingQuote != null && existingQuote.isFavorite) {
+            quoteDao.updateQuote(quote.copy(isFavorite = false))
         } else {
-            favorites.add(quote.copy(isFavorite = true))
+            quoteDao.insertQuote(quote.copy(isFavorite = true))
         }
     }
 
-    fun isFavorite(quoteId: Int): Boolean {
-        return favorites.any { it.id == quoteId }
+    suspend fun isFavorite(quoteId: Int): Boolean {
+        val quote = quoteDao.getQuoteById(quoteId)
+        return quote?.isFavorite ?: false
     }
-
-    fun getFavorites(): List<Quote> = favorites
 }

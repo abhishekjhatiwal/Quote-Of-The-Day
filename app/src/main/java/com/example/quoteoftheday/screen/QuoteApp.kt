@@ -18,14 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.example.quoteoftheday.QuoteViewModel
 import com.example.quoteoftheday.data.QuoteRepository
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuoteApp() {
-    var selectedScreen by remember { mutableStateOf("Home") }
-    var currentQuote by remember { mutableStateOf(QuoteRepository.getQuoteForDate(Date())) }
+fun QuoteApp(viewModel: QuoteViewModel) {
+    var selectedScreen by remember { mutableStateOf("home") }
 
     Scaffold(
         topBar = {
@@ -63,11 +63,8 @@ fun QuoteApp() {
                 )
         ) {
             when (selectedScreen) {
-                "home" -> HomeScreen(
-                    quote = currentQuote,
-                    onRefresh = { currentQuote = QuoteRepository.getRandomQuote() }
-                )
-                "favorites" -> FavoritesScreen()
+                "home" -> HomeScreen(viewModel)
+                "favorites" -> FavoritesScreen(viewModel)
             }
         }
     }

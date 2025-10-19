@@ -24,7 +24,7 @@ import java.util.Date
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuoteApp() {
-    var selectedScreen by remember { mutableStateOf("home") }
+    var selectedScreen by remember { mutableStateOf("Home") }
     var currentQuote by remember { mutableStateOf(QuoteRepository.getQuoteForDate(Date())) }
 
     Scaffold(

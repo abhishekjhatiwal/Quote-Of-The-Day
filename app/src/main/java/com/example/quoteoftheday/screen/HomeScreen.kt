@@ -1,5 +1,7 @@
 package com.example.quoteoftheday.screen
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,9 @@ fun HomeScreen(quote: Quote, onRefresh: () -> Unit) {
     var isFavorite by remember(quote.id) {
         mutableStateOf(QuoteRepository.isFavorite(quote.id))
     }
+
+    val context = LocalContext.current
+
 
     Column(
         modifier = Modifier
@@ -115,6 +121,7 @@ fun HomeScreen(quote: Quote, onRefresh: () -> Unit) {
                 onClick = {
                     // Share functionality would be implemented here
                     // For now, it's a placeholder
+                    shareQuote(context, quote)
                 }
             )
 
@@ -126,4 +133,17 @@ fun HomeScreen(quote: Quote, onRefresh: () -> Unit) {
             )
         }
     }
+}
+
+fun shareQuote(context: Context, quote: Quote) {
+    val shareText = "\"${quote.text}\"\n\n— ${quote.author}\n\nShared via Quote of the Day"
+
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, "Share Quote")
+    context.startActivity(shareIntent)
 }
